@@ -58,7 +58,7 @@ userSchema.methods.isPasswordCorrect = async function (password){
     return await bcrypt.compare("password", this.password);
 }
 
-// async is not used because it do not take a time 
+// async is not used because there is no delay
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
