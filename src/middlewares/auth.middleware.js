@@ -88,13 +88,13 @@ import { User } from "../models/user.model.js";
 export const verifyJWT = asyncHandler(async (req, _, next) => {
     try {
         // Log incoming cookies and headers for debugging
-        console.log("Request Cookies:", req.cookies);
-        console.log("Request Headers:", req.headers);
+        // console.log("Request Cookies:", req.cookies);
+        // console.log("Request Headers:", req.headers);
 
         // Retrieve the token
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
-        console.log("Token:", token); // Log the token
+        // console.log("Token:", token); // Log the token
 
         // Check if token exists and is a string
         if (!token || typeof token !== 'string') {
@@ -103,11 +103,11 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
 
         // Verify the token
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        console.log("Decoded Token:", decodedToken);
+        // console.log("Decoded Token:", decodedToken);
 
         // Fetch user from database
         const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
-        console.log("User:", user);
+        // console.log("User:", user);
 
         if (!user) {
             throw new ApiError(401, "Invalid Access Token");
