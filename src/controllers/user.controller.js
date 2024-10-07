@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
 
 // asyncHandler is not used because in this method we are not handing any web request
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -192,56 +193,56 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
 
 
-// const logoutUser =  asyncHandler(async(req, res) =>{
-//     await User.findByIdAndUpdate(
-//         req.user._id,
-//         {
-//             $unset:{
-//                 refreshToken: 1  // this removes the field from document
-//             }
-//         },
-//         {
-//             new:true
-//         }
-//     )
-
-//     const options = {
-//         httpOnly:true,
-//         secure:true
-//     }
-
-//     return res
-//     .status(200)
-//     .clearCookie("accessToken", options)
-//     .clearCookie("refreshToken", options)
-//     .json(new ApiResponse(200, {}, "User logged Out"))
-// })
-
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser =  asyncHandler(async(req, res) =>{
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: null
+            $unset:{
+                refreshToken: 1  // this removes the field from document
             }
-
         },
         {
-            new: true
+            new:true
         }
     )
 
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly:true,
+        secure:true
     }
 
     return res
-        .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
-        .json(new ApiResponse(200, {}, "User logged Out"))
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged Out"))
 })
+
+// const logoutUser = asyncHandler(async (req, res) => {
+//     await User.findByIdAndUpdate(
+//         req.user._id,
+//         {
+//             $set: {
+//                 refreshToken: null
+//             }
+
+//         },
+//         {
+//             new: true
+//         }
+//     )
+
+//     const options = {
+//         httpOnly: true,
+//         secure: true
+//     }
+
+//     return res
+//         .status(200)
+//         .clearCookie("accessToken", options)
+//         .clearCookie("refreshToken", options)
+//         .json(new ApiResponse(200, {}, "User logged Out"))
+// })
 
 
 
@@ -343,7 +344,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid fullname and email");
     }
 
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -354,7 +355,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         { new: true }
     ).select("-password")
 
-    console.log(user);
+    console.log(user.fullname);
+    console.log(user.email);
 
     console.log("account details changed successfully")
 
@@ -496,7 +498,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiError(200, channel[0], "User channe fetched successfully"))
+    .json(new ApiResponse(200, channel[0], "User channel fetched successfully"))
 })
 
 
